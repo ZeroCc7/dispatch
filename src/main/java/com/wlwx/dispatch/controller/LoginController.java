@@ -24,7 +24,6 @@ public class LoginController {
 
     @RequestMapping("index")
     public String GetUserList() {
-        System.out.println("index");
         return "index";
     }
 }

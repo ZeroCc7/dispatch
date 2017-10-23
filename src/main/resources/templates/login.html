@@ -1,45 +1,88 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
-<head>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-<meta name="viewport" content="width=device-width, initial-scale=1"> 
-<title>login</title>
-<link rel="stylesheet" type="text/css" href="css/normalize.css" />
-<link rel="stylesheet" type="text/css" href="css/demo.css" />
-<!--必要样式-->
-<link rel="stylesheet" type="text/css" href="css/component.css" />
-<!--[if IE]>
-<script src="js/html5.js"></script>
-<![endif]-->
-</head>
-<body>
-		<div class="container demo-1">
-			<div class="content">
-				<div id="large-header" class="large-header">
-					<canvas id="demo-canvas"></canvas>
-					<div class="logo_box">
-						<h3>欢迎你</h3>
-						<form id="login_from" method="post" action="/login">
-							<div class="input_outer">
-								<span class="u_user"></span>
-								<input name="username" class="text" style="color: #FFFFFF !important" type="text" placeholder="请输入账户">
-							</div>
-							<div class="input_outer">
-								<span class="us_uer"></span>
-								<input name="password" class="text" style="color: #FFFFFF !important; position:absolute; z-index:100;"value="" type="password" placeholder="请输入密码">
-							</div>
-							<div class="mb2">
-								<a class="act-but submit" onclick="document.getElementById('login_from').submit();" style="color: #FFFFFF">登录</a>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div><!-- /container -->
-		<script src="js/TweenLite.min.js"></script>
-		<script src="js/EasePack.min.js"></script>
-		<script src="js/rAF.js"></script>
-		<script src="js/demo-1.js"></script>
-	</body>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+<head xmlns="http://www.w3.org/1999/html">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="format-detection" content="telephone=no">
+        <meta charset="UTF-8">
+
+        <meta name="description" content="Violate Responsive Admin Template">
+        <meta name="keywords" content="Super Admin, Admin, Template, Bootstrap">
+
+        <title>Super Admin Responsive Template</title>
+            
+        <!-- CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/form.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+        <link href="css/animate.css" rel="stylesheet">
+        <link href="css/generics.css" rel="stylesheet"> 
+    </head>
+    <body id="skin-blur-violate">
+        <section id="login">
+            <header>
+                <h1>Dispatch</h1>
+                <p></p>
+            </header>
+        
+            <div class="clearfix"></div>
+            
+            <!-- Login -->
+            <form class="box tile animated active" id="box-login" action="/login" method="post">
+                <h2 class="m-t-0 m-b-15">Login</h2>
+                <input type="text" class="login-control m-b-10" name="username" placeholder="Username">
+                <input type="password" class="login-control" name="password" placeholder="Password">
+                <div class="checkbox m-b-20">
+                    <!--<label>
+                        <input type="checkbox">
+                        Remember Me
+                    </label>-->
+                    </br>
+                </div>
+                <button class="btn btn-sm m-r-5" type="submit">Sign In</button>
+                
+                <small>
+                    <a class="box-switcher" data-switch="box-register" href="">Don't have an Account?</a> or
+                    <a class="box-switcher" data-switch="box-reset" href="">Forgot Password?</a>
+                </small>
+            </form>
+            
+            <!-- Register -->
+            <form class="box animated tile" id="box-register">
+                <h2 class="m-t-0 m-b-15">Register</h2>
+                <input type="text" class="login-control m-b-10" placeholder="Full Name">
+                <input type="text" class="login-control m-b-10" placeholder="Username">
+                <input type="email" class="login-control m-b-10" placeholder="Email Address">    
+                <input type="password" class="login-control m-b-10" placeholder="Password">
+                <input type="password" class="login-control m-b-20" placeholder="Confirm Password">
+
+                <button class="btn btn-sm m-r-5">Register</button>
+
+                <small><a class="box-switcher" data-switch="box-login" href="">Already have an Account?</a></small>
+            </form>
+            
+            <!-- Forgot Password -->
+            <form class="box animated tile" id="box-reset">
+                <h2 class="m-t-0 m-b-15">Reset Password</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu risus. Curabitur commodo lorem fringilla enim feugiat commodo sed ac lacus.</p>
+                <input type="email" class="login-control m-b-20" placeholder="Email Address">    
+
+                <button class="btn btn-sm m-r-5">Reset Password</button>
+
+                <small><a class="box-switcher" data-switch="box-login" href="">Already have an Account?</a></small>
+            </form>
+        </section>                      
+        
+        <!-- Javascript Libraries -->
+        <!-- jQuery -->
+        <script src="js/jquery.min.js"></script> <!-- jQuery Library -->
+        
+        <!-- Bootstrap -->
+        <script src="js/bootstrap.min.js"></script>
+        
+        <!--  Form Related -->
+        <script src="js/icheck.js"></script> <!-- Custom Checkbox + Radio -->
+        
+        <!-- All JS functions -->
+        <script src="js/functions.js"></script>
+    </body>
 </html>
