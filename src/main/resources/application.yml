@@ -1,0 +1,35 @@
+server:
+  session-timeout : 3600
+  port: 3000
+
+#数据库连接配置
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@172.20.0.56:1521:oracle11
+    username: smsdb
+    password: zcl941217
+    driver-class-name: oracle.jdbc.OracleDriver
+  thymeleaf:
+    mode: HTML5
+    cache: false
+  #字符集和json格式工具
+  http:
+    encoding:
+      charset: utf-8
+    converters:
+      preferred-json-mapper: jackson
+    multipart:
+      max-file-size: 10MB
+  application:
+    name: disapatch
+#mybatis配置
+mybatis:
+  type-aliases-package: com.wlwx.dispatch.entity
+  #mapper加载路径
+  mapper-locations: classpath:mapper/*.xml
+  #myatbis配置文件
+  config-location: classpath:mybatis-conf.xml
+
+
+
+
