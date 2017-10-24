@@ -1,17 +1,11 @@
 package com.wlwx.dispatch.controller;
 
-import com.sun.xml.internal.txw2.output.ResultFactory;
-import com.wlwx.dispatch.entity.Person;
-import com.wlwx.dispatch.util.ResultInfo;
-import com.wlwx.dispatch.util.ResultInfoFactory;
+import com.wlwx.dispatch.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Controller
@@ -22,8 +16,15 @@ public class LoginController {
         return "login";
     }
 
+    @RequestMapping("/login")
+    public String toLogin() {
+        return "login";
+    }
+
     @RequestMapping("index")
-    public String GetUserList() {
+    public String GetUserList(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         return "index";
     }
 }

@@ -31,7 +31,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable();//配置安全策略
         http.authorizeRequests().antMatchers("/","/login/**","/login/auth").permitAll()//定义/请求不需要验证
-                .antMatchers("/index","admin/**").authenticated() //其余的所有请求都需要验证
+                .antMatchers("/index/**","admin/**").authenticated() //其余的所有请求都需要验证
                 .and().rememberMe().tokenValiditySeconds(3600)
                 .and().formLogin().loginPage("/login").defaultSuccessUrl("/index").permitAll()
                 .and().logout().logoutUrl("/admin/loginOut").permitAll();
