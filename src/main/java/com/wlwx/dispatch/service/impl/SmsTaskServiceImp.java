@@ -1,5 +1,6 @@
 package com.wlwx.dispatch.service.impl;
 
+import com.wlwx.dispatch.entity.DayNum;
 import com.wlwx.dispatch.entity.Notice;
 import com.wlwx.dispatch.entity.SmsTask;
 import com.wlwx.dispatch.mapper.NoticeMapper;
@@ -23,5 +24,10 @@ public class SmsTaskServiceImp implements SmsTaskService {
     @Override
     public List<SmsTask> getTodaySmsTasks() {
         return smsTaskMapper.getTodaySmsTasks();
+    }
+
+    @Override
+    public List<DayNum> getMonthlySmsTasks() {
+        return smsTaskMapper.getMonthlySmsTasks();
     }
 }

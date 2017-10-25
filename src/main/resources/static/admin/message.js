@@ -4,7 +4,6 @@ $(function() {
     $.ajax({
         url: '/index/message/messages',
         success: function (data) {
-            console.log(data);
             $("#top_messagetab").html(data);
         }
     });

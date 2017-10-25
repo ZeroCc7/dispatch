@@ -5,7 +5,21 @@
 //Line Chart
 $(function () {
     if ($('#line-chart')[0]) {
-        var d1 = [[1,14], [2,15], [3,18], [4,16], [5,19], [6,17], [7,15], [8,16], [9,20], [10,16], [11,18]];
+        var d1 = [];
+        $.ajax({
+            type: "POST",
+            url: '/smstask/getMonthlySmsTask',
+            // data: {username: username, password: password},
+            async: false,
+            success: function (data) {
+                for(var i=0;i<data.length;i++){
+                    var day = data[i].day;
+                    var tolnum = data[i].tolnum;
+                    d1.push([day,tolnum]);
+                    console.log(d1);
+                }
+            }
+        });
 
         $.plot('#line-chart', [ {
             data: d1,
@@ -29,8 +43,6 @@ $(function () {
                 },
 
                 yaxis: {
-                    min: 10,
-                    max: 22,
                     tickColor: 'rgba(255,255,255,0.15)',
                     tickDecimals: 0,
                     font :{
@@ -41,6 +53,8 @@ $(function () {
                     shadowSize: 0,
                 },
                 xaxis: {
+                    min: 1,
+                    max: 30,
                     tickColor: 'rgba(255,255,255,0)',
                     tickDecimals: 0,
                     font :{
@@ -64,8 +78,8 @@ $(function () {
 
         $("#line-chart").bind("plothover", function (event, pos, item) {
             if (item) {
-                var x = item.datapoint[0].toFixed(2),
-                    y = item.datapoint[1].toFixed(2);
+                var x = item.datapoint[0],
+                    y = item.datapoint[1];
                 $("#linechart-tooltip").html(item.series.label + " of " + x + " = " + y).css({top: item.pageY+5, left: item.pageX+5}).fadeIn(200);
             }
             else {

@@ -18,4 +18,12 @@
         <include refid="getSmsTask"/>
         WHERE trunc(a.submit_time)=trunc(sysdate)
     </select>
+    <!--查询当月分组数据-->
+    <select id="getMonthlySmsTasks" parameterType="String" resultType="DayNum">
+          select to_char(a.submit_time, 'dd') day , sum(a.sended_num) tolnum
+            from t_sms_task a
+           where to_char(sysdate, 'yyyy-mm') = to_char(a.submit_time, 'yyyy-mm')
+        group by to_char(a.submit_time, 'dd')
+        order by to_char(a.submit_time, 'dd')
+    </select>
 </mapper>
