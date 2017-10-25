@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+    <div class="media" th:each="notic : ${noticeList}">
+        <div class="media-body">
+            <small class="text-muted" th:text="${notic.theme}"> </small>
+            <br>
+            <a class="t-overflow" href="" th:text="${notic.content}"></a>
+        </div>
+    </div>
+</html>

@@ -7,19 +7,13 @@
     <div class="clearfix"></div>
         
         <section id="main" class="p-relative" role="main">
-            
+
             <!-- 侧边栏 -->
             <aside  th:replace="~{partial/sidebar :: sidebar}"></aside>
             <!-- Content -->
             <section id="content" class="container">
-
-                <!-- Breadcrumb -->
-                <ol class="breadcrumb hidden-xs">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Library</a></li>
-                    <li class="active">Data</li>
-                </ol>
-                
+                <!-- Messages Drawer -->
+                <div  th:replace="~{partial/topmessage :: topmessage}"></div>
                 <h4 class="page-title">TABLES</h4>
                 <!-- Table Hover -->
                 <div class="block-area" id="tableHover">
@@ -61,23 +55,6 @@
             <br/><br/>
         </section>
         
-        <!--&lt;!&ndash; Javascript Libraries &ndash;&gt;
-        &lt;!&ndash; jQuery &ndash;&gt;
-        <script src="js/jquery.min.js"></script> &lt;!&ndash; jQuery Library &ndash;&gt;
-
-        &lt;!&ndash; Bootstrap &ndash;&gt;
-        <script src="js/bootstrap.min.js"></script>
-
-        &lt;!&ndash; UX &ndash;&gt;
-        <script src="js/scroll.min.js"></script> &lt;!&ndash; Custom Scrollbar &ndash;&gt;
-
-        &lt;!&ndash; Other &ndash;&gt;
-        <script src="js/calendar.min.js"></script> &lt;!&ndash; Calendar &ndash;&gt;
-        <script src="js/feeds.min.js"></script> &lt;!&ndash; News Feeds &ndash;&gt;
-
-
-        &lt;!&ndash; All JS functions &ndash;&gt;
-        <script src="js/functions.js"></script>-->
     </body>
 </html>
 

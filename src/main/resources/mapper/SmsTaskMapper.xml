@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wlwx.dispatch.mapper.SmsTaskMapper">
+    <sql id="getSmsTask">
+        SELECT a.success_num,a.fail_num,a.send_task_id,a.cust_id,a.task_id,a.task_name,
+               a.sms_content,to_char(a.submit_time, 'yyyy-mm-dd hh24:mi:ss') submit_time,
+               to_char(a.begin_time, 'yyyy-mm-dd hh24:mi:ss') begin_time,to_char(a.end_time, 'yyyy-mm-dd hh24:mi:ss') end_time,
+               a.status,a.status_note,a.total_num,a.sended_num,a.divided_num,a.charge_fee,a.charge_amount,a.create_by,
+               a.invalid_num,a.black_num,a.file_name,to_char(a.create_time, 'yyyy-mm-dd hh24:mi:ss') create_time,
+               to_char(a.finish_time, 'yyyy-mm-dd hh24:mi:ss') finish_time,a.dest_type,a.dest_mobile,a.create_user,b.cust_name
+          FROM t_sms_task a
+          JOIN t_sms_customer b
+            ON a.cust_id = b.cust_id
+    </sql>
+    <select id="getTodaySmsTasks" parameterType="String" resultType="SmsTask">
+        <include refid="getSmsTask"/>
+        WHERE trunc(a.submit_time)=trunc(sysdate)
+    </select>
+</mapper>

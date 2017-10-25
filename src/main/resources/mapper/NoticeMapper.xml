@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wlwx.dispatch.mapper.NoticeMapper">
+    <select id="getNotice" parameterType="String" resultType="notice">
+        SELECT n.notice_id,n.theme,n.content,n.publisher,
+               n.published,n.is_popup,n.enabled,n.belong,n.receivertype
+	      FROM t_notice n
+	  ORDER By published DESC
+    </select>
+</mapper>
