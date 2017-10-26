@@ -16,7 +16,6 @@ $(function () {
                     var day = data[i].day;
                     var tolnum = data[i].tolnum;
                     d1.push([day,tolnum]);
-                    console.log(d1);
                 }
             }
         });

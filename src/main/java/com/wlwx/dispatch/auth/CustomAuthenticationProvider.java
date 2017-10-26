@@ -58,7 +58,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     public void config(WebSecurity web) {
-        web.ignoring().antMatchers("/js/**", "/css/**", "/vendor/**", "/image/**", "/admin/**");
+        web.ignoring().antMatchers("/js/**", "/css/**", "/vendor/**", "/img/**", "/font/**","/media/**", "/admin/**");
     }
 
     @Override

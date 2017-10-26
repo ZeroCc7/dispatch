@@ -30,7 +30,7 @@ public class LoginController {
         return "login";
     }
 
-    @RequestMapping("index")
+    @RequestMapping("/index")
     public String GetUserList(Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
         List<SmsTask> smsTasks = smsTaskService.getTodaySmsTasks();

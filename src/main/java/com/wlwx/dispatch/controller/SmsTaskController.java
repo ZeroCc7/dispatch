@@ -6,6 +6,7 @@ import com.wlwx.dispatch.mapper.SmsTaskMapper;
 import com.wlwx.dispatch.service.SmsTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,5 +29,16 @@ public class SmsTaskController {
     public List<DayNum> getMonthlySmsTask(){
         List<DayNum> dayNums = smsTaskService.getMonthlySmsTasks();
         return dayNums;
+    }
+
+    /**
+     * 获取短信群发任务
+     * @return
+     */
+    @RequestMapping("/smstasklist")
+    public String getSmsTaskList(Model model){
+        List<SmsTask> smsTasks = smsTaskService.getTodaySmsTasks();
+        model.addAttribute("smsTasks",smsTasks);
+        return "smstask/smstasklist";
     }
 }

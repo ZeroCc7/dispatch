@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head th:replace="~{partial/head :: head}"></head>
+    <body id="skin-blur-lights">
+    <header id="header" class="media" th:replace="~{partial/header :: header}"></header>
+
+    <div class="clearfix"></div>
+        
+        <section id="main" class="p-relative" role="main">
+
+            <!-- 侧边栏 -->
+            <aside  th:replace="~{partial/sidebar :: sidebar}"></aside>
+            <!-- Content -->
+            <section id="content" class="container">
+                <!-- Messages Drawer -->
+                <div  th:replace="~{partial/topmessage :: topmessage}"></div>
+                <h4 class="page-title">SMSTASK TABLES</h4>
+                <!-- Table Hover -->
+                <div class="block-area" id="tableHover">
+                    <h3 class="block-title">Table with Hover Style</h3>
+                    <div class="table-responsive overflow" id="smstask_datelist">
+                        <table class="table table-bordered table-hover tile">
+                            <thead>
+                            <tr>
+                                <th>TaskId</th>
+                                <th>Task Name</th>
+                                <th>Submit Time</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="smstask : ${smsTasks}">
+                                <td th:text="${smstask.task_id}"></td>
+                                <td th:text="${smstask.task_name}"> </td>
+                                <td th:text="${smstask.submit_time}"></td>
+                                <td th:switch="${smstask.status}">
+                                    <p th:case="2">待审核</p>
+                                    <p th:case="3">拒绝</p>
+                                    <p th:case="4">审核通过</p>
+                                    <p th:case="5">执行中</p>
+                                    <p th:case="6">暂停</p>
+                                    <p th:case="7">取消</p>
+                                    <p th:case="8">执行终止</p>
+                                    <p th:case="9">执行失败</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <br/><br/>
+        </section>
+        
+    </body>
+</html>
+
