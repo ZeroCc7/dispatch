@@ -31,7 +31,6 @@ public class MessageController {
 
     @RequestMapping("/index/message/messages")
     public String loadMessage(Model model){
-        System.out.println("getNotice");
         List<Notice> noticeList =messageService.getTopMessage();
         model.addAttribute("noticeList",noticeList);
         return "message/messageTab";
@@ -41,7 +40,6 @@ public class MessageController {
     @MessageMapping("/send")
     @SendTo("/topic/send")
     public SocketMessage send(SocketMessage message) throws Exception {
-        System.out.println(message.getMessage());
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         message.setDate(df.format(new Date())) ;
         return message;

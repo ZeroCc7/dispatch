@@ -3,6 +3,15 @@ package com.wlwx.dispatch.entity;
 public class SocketMessage {
     private String message;
     private String date;
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getMessage() {
         return message;
