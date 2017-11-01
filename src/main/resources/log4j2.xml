@@ -7,8 +7,19 @@
 
     <appenders>
         <Console name="Console" target="system_out">
-            <PatternLayout pattern="${PATTERN}" />
+            <PatternLayout pattern="${PATTERN}"/>
         </Console>
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileInfo" fileName="D:/logs/dispatch/run.log"
+                     filePattern="D:/logs/dispatch/$${date:yyyy-MM}/run-%d{yyyy-MM-dd}-%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>
     </appenders>
     <!--配置mybatis日志-->
     <loggers>
@@ -19,9 +30,9 @@
         <logger name="log4j.logger.java.sql" level="debug" additivity="false">
             <appender-ref ref="Console"/>
         </logger>
-        <logger name="com.wlwx.dispatch.mapper" level="debug" />
+        <logger name="com.eumji.zblog.mapper" level="debug"/>
         <root level="info">
-            <appenderref ref="Console" />
+            <appenderref ref="Console"/>
         </root>
     </loggers>
 

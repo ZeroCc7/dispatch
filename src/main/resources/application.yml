@@ -30,6 +30,8 @@ mybatis:
   #myatbis配置文件
   config-location: classpath:mybatis-conf.xml
 
-
+cust:
+  smstask:
+    logname: D:\\logs\\cust\\smslog.log
 
 

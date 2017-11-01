@@ -14,40 +14,76 @@
             <section id="content" class="container">
                 <!-- Messages Drawer -->
                 <div  th:replace="~{partial/topmessage :: topmessage}"></div>
-                <h4 class="page-title">SMSTASK TABLES</h4>
-                <!-- Table Hover -->
-                <div class="block-area" id="tableHover">
-                    <h3 class="block-title">Table with Hover Style</h3>
-                    <div class="table-responsive overflow" id="smstask_datelist">
-                        <table class="table table-bordered table-hover tile">
-                            <thead>
-                            <tr>
-                                <th>TaskId</th>
-                                <th>Task Name</th>
-                                <th>Submit Time</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="smstask : ${smsTasks}">
-                                <td th:text="${smstask.task_id}"></td>
-                                <td th:text="${smstask.task_name}"> </td>
-                                <td th:text="${smstask.submit_time}"></td>
-                                <td th:switch="${smstask.status}">
-                                    <p th:case="2">待审核</p>
-                                    <p th:case="3">拒绝</p>
-                                    <p th:case="4">审核通过</p>
-                                    <p th:case="5">执行中</p>
-                                    <p th:case="6">暂停</p>
-                                    <p th:case="7">取消</p>
-                                    <p th:case="8">执行终止</p>
-                                    <p th:case="9">执行失败</p>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                <h4 class="page-title b-0">List Views</h4>
+
+                <div class="listview list-container">
+                    <header class="listview-header media">
+                        <input type="checkbox" class="pull-left list-parent-check" value="">
+                        <ul class="list-inline pull-right m-t-5 m-b-0">
+                            <!--<li class="pagin-value hidden-xs">35-70</li>-->
+                            <li>
+                                <a href="" title="Previous" class="tooltips">
+                                    <i class="sa-list-back"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" title="Next" class="tooltips">
+                                    <i class="sa-list-forwad"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="list-inline list-mass-actions pull-left">
+                            <!--<li>-->
+                                <!--<a data-toggle="modal" href="#compose-message" title="Add" class="tooltips">-->
+                                    <!--<i class="sa-list-add"></i>-->
+                                <!--</a>-->
+                            <!--</li>-->
+                            <li>
+                                <a href="" title="Refresh" class="tooltips">
+                                    <i class="sa-list-refresh"></i>
+                                </a>
+                            </li>
+                            <li class="show-on" style="display: none;">
+                                <a href="" title="Move" class="tooltips">
+                                    <i class="sa-list-move"></i>
+                                </a>
+                            </li>
+                            <li class="show-on" style="display: none;">
+                                <a href="" title="Delete" class="tooltips">
+                                    <i class="sa-list-delete"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <input class="input-sm col-md-4 pull-right message-search" type="text" placeholder="Search....">
+                        <div class="clearfix"></div>
+                    </header>
+                    <div class="media" th:each="smstask : ${smsTasks}">
+                        <input type="checkbox" class="pull-left list-check" value="">
+                        <div class="media-body">
+                            [[${smstask.sms_content}]]
+                            <div class="clearfix"></div>
+                            <div class="attrs">任务ID: [[${smstask.task_id}]] </div>
+                            <div class="attrs">提交时间: [[${smstask.submit_time}]] </div>
+                            <div class="block attrs">总条数: [[${smstask.total_num}]]</div>
+                            <div  th:switch="${smstask.status}">
+                                <p class="block attrs" th:case="2">待审核</p>
+                                <p class="block attrs" th:case="3">拒绝</p>
+                                <p class="block attrs" th:case="4">审核通过</p>
+                                <p class="block attrs" th:case="5">执行中</p>
+                                <p class="block attrs" th:case="6">暂停</p>
+                                <p class="block attrs" th:case="7">取消</p>
+                                <p class="block attrs" th:case="8">执行终止</p>
+                                <p class="block attrs" th:case="9">执行失败</p>
+                            </div>
+
+                            <div class="list-options">
+                                <button class="btn btn-sm">View</button>
+                                <button class="btn btn-sm">Delete</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    </div>
+
             </section>
             <br/><br/>
         </section>

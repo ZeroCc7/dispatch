@@ -31,7 +31,7 @@ public class LoginController {
     }
 
     @RequestMapping("/index")
-    public String GetUserList(Model model, HttpSession session) {
+    public String index(Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
         List<SmsTask> smsTasks = smsTaskService.getTodaySmsTasks();
         int tolTaskNum = smsTasks.size();

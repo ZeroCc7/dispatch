@@ -4,6 +4,7 @@ import com.wlwx.dispatch.entity.Notice;
 import com.wlwx.dispatch.entity.SocketMessage;
 import com.wlwx.dispatch.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,21 +14,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @Controller
-@EnableScheduling
 public class MessageController {
 
     @Autowired
     MessageService messageService;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
 
     @RequestMapping("/index/message/messages")
     public String loadMessage(Model model){
@@ -37,21 +37,5 @@ public class MessageController {
 
     }
 
-    @MessageMapping("/send")
-    @SendTo("/topic/send")
-    public SocketMessage send(SocketMessage message) throws Exception {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        message.setDate(df.format(new Date())) ;
-        return message;
-    }
-
-    @Scheduled(fixedRate = 1000)
-    @SendTo("/topic/callback")
-    public Object callback() throws Exception {
-        // 发现消息
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        messagingTemplate.convertAndSend("/topic/callback", df.format(new Date()));
-        return "callback";
-    }
 
 }

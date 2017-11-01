@@ -15,8 +15,10 @@ function connect() {
     var socket = new SockJS('/my-websocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        // stompClient.subscribe('/topic/callback', function (response) {
-        //     showResponse(response.body);
+        //日志获取WEBSCOKET
+        // stompClient.subscribe('/topic/getLogFromFile', function (response) {
+        //     console.log(response);
+        //     showLogResponse(response.body);
         // });
         //建立获取的连接。
         stompClient.subscribe('/topic/send', function (response) {
@@ -54,7 +56,10 @@ function showResponse(message) {
                  "</div>"+
             "</div>";
     }
-
-
     $("#messagebody").append(msg);
+}
+function showLogResponse(message) {
+    console.log(message);
+    var msg = "<p>"+message+"</p>";
+    $("#log_message").append(msg);
 }
