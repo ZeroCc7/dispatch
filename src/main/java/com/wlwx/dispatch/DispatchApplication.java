@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class DispatchApplication {
 
     public static void main(String[] args) {
+        //Test
         SpringApplication.run(DispatchApplication.class, args);
     }
 }
