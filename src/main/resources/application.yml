@@ -5,7 +5,7 @@ server:
 #数据库连接配置
 spring:
   datasource:
-    url: jdbc:oracle:thin:@172.20.0.56:1521:oracle11
+    url: jdbc:oracle:thin:@172.20.0.228:1521:oracle11
     username: smsdb
     password: zcl941217
     driver-class-name: oracle.jdbc.OracleDriver
@@ -35,5 +35,19 @@ cust:
     logname: D:\\logs\\cust\\smslog.log
 
 
-
-
+dispatch:
+  datCoreSize : 16
+  datMaxSize : 16
+  datQueueSize : 100000
+  maxSendRate : 5000
+  custId : 1098
+  firstSmsCustId : 1099
+  custCode : 1000
+  custPassword : 10000
+  firstCustCode : 10000
+  firstCustPassword : 10000
+  reportSleepTime : 10000
+  moSleepTime : 10000
+  reportMoPort : 9001
+  baseUrl : 172.20.0.228:8860
+  sendRate : 2222

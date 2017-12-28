@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!--[if IE 9 ]><html class="ie9"><![endif]-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head xmlns="http://www.w3.org/1999/html">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
         <meta name="format-detection" content="telephone=no">
@@ -25,52 +25,18 @@
             </header>
         
             <div class="clearfix"></div>
-            
+
             <!-- Login -->
             <form class="box tile animated active" id="box-login" action="/login" method="post">
                 <h2 class="m-t-0 m-b-15">Login</h2>
-                <input type="text" class="login-control m-b-10" name="username" placeholder="Username">
-                <input type="password" class="login-control" name="password" placeholder="Password">
-                <div class="checkbox m-b-20">
-                    <!--<label>
-                        <input type="checkbox">
-                        Remember Me
-                    </label>-->
-                    </br>
+                <div class="form-group">
+                    <input type="text" class="login-control m-b-10" name="username" placeholder="Username">
+                    <input type="password" class="login-control" name="password" placeholder="Password">
                 </div>
                 <button class="btn btn-sm m-r-5" type="submit">Sign In</button>
-                
-                <small>
-                    <a class="box-switcher" data-switch="box-register" href="">Don't have an Account?</a> or
-                    <a class="box-switcher" data-switch="box-reset" href="">Forgot Password?</a>
-                </small>
+                <h6 th:if="${param.error}" class="label label-danger">账户名密码错误，请重试！</h6>
             </form>
-            
-            <!-- Register -->
-            <form class="box animated tile" id="box-register">
-                <h2 class="m-t-0 m-b-15">Register</h2>
-                <input type="text" class="login-control m-b-10" placeholder="Full Name">
-                <input type="text" class="login-control m-b-10" placeholder="Username">
-                <input type="email" class="login-control m-b-10" placeholder="Email Address">    
-                <input type="password" class="login-control m-b-10" placeholder="Password">
-                <input type="password" class="login-control m-b-20" placeholder="Confirm Password">
-
-                <button class="btn btn-sm m-r-5">Register</button>
-
-                <small><a class="box-switcher" data-switch="box-login" href="">Already have an Account?</a></small>
-            </form>
-            
-            <!-- Forgot Password -->
-            <form class="box animated tile" id="box-reset">
-                <h2 class="m-t-0 m-b-15">Reset Password</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu risus. Curabitur commodo lorem fringilla enim feugiat commodo sed ac lacus.</p>
-                <input type="email" class="login-control m-b-20" placeholder="Email Address">    
-
-                <button class="btn btn-sm m-r-5">Reset Password</button>
-
-                <small><a class="box-switcher" data-switch="box-login" href="">Already have an Account?</a></small>
-            </form>
-        </section>                      
+        </section>
         
         <!-- Javascript Libraries -->
         <!-- jQuery -->

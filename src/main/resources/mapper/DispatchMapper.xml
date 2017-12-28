@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wlwx.dispatch.mapper.DispatchMapper">
+    <select id="getAllWaitSendSmsTask"  resultType="com.wlwx.dispatch.entity.dispatch.Smdown">
+        SELECT *
+        FROM (select a.downid,
+        a.sm_serialphones,
+        a.sm_content,
+        a.sm_ismgtype,
+        a.sm_servicecode,
+        to_char(a.sm_sendtime, 'yyyy-mm-dd hh24:mi:ss') sm_sendtime,
+        a.sm_batchno,
+        a.sm_servicename,
+        to_char(a.downtime, 'yyyy-mm-dd hh24:mi:ss') downtime,
+        a.sendlevel,
+        a.taskstatus
+        from EFD_SMDOWN a
+        where a.sm_sendtime &lt;= sysdate
+        and a.taskstatus = 0
+        order by sendlevel desc, downtime) t
+        where rownum &lt;= 1000
+
+    </select>
+
+    <select id="getCusomerById" parameterType="int" resultType="com.wlwx.dispatch.entity.dispatch.Customer">
+        select a.cust_id,a.cust_code,a.cust_name,a.passwd,a.client_ip,
+        a.audit_flag,a.threads,a.blacklist_filter,a.sensitive_words_filter,
+        a.parent_id,a.status,a.create_time,a.create_by,b.send_rate
+        from t_sms_customer a
+        left join t_sms_customer_parameter b
+        on a.cust_id = b.cust_id
+        where a.cust_id = #{value}
+        and status = '1'
+    </select>
+
+
+    <update id="updateSmdownStatus" parameterType="com.wlwx.dispatch.entity.dispatch.Smdown">
+        update EFD_SMDOWN
+        set taskstatus = 3
+        where downid = #{downid}
+    </update>
+
+
+
+    <insert id="insertEfdSmrpt" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+        insert into EFD_SMRPT t
+        (rptid, downid,sm_serialno, sm_recvphone,sm_content,sm_ismgtype,sm_servicecode,sm_sendtime,
+        sm_batchno,sm_servicename,downtime,sendcode,sendlevel,  gatewayno,messageid,sendtime,res_status,
+        res_time,rpt_status,rpt_time,rpt_code,subtime,pknumber,pktotal,markinfo)
+        values
+        (emp_rptid.nextval,#{downid},#{sm_serialno}, #{sm_recvphone},#{sm_content},#{sm_ismgtype},#{sm_servicecode},
+        to_date(#{sm_sendtime}, 'yyyy-mm-dd hh24:mi:ss'),  #{sm_batchno},#{sm_servicename},
+        to_date(#{downtime}, 'yyyy-mm-dd hh24:mi:ss'),#{sendcode},#{sendlevel},#{gatewayno},#{messageid},
+        to_date(#{sendtime}, 'yyyy-mm-dd hh24:mi:ss'),#{res_status},
+        to_date(#{res_time}, 'yyyy-mm-dd hh24:mi:ss'),#{rpt_status},
+        to_date(#{rpt_time}, 'yyyy-mm-dd hh24:mi:ss'),#{rpt_code},
+        sysdate,#{pknumber},#{pktotal},#{markinfo})
+    </insert>
+
+    <update id="updateTaskStatusToEnd" parameterType="com.wlwx.dispatch.entity.dispatch.Smdown">
+        update EFD_SMDOWN
+        set taskstatus = 1
+        where downid = #{downid}
+    </update>
+
+    <update id="initTaskStatus" parameterType="com.wlwx.dispatch.entity.dispatch.Smdown">
+        update EFD_SMDOWN
+        set taskstatus = 0
+        where taskstatus = 3
+    </update>
+
+
+    <update id="updateEfdSmrpt" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+        update EFD_SMRPT t
+        set t.rpt_status=#{rpt_status},
+        t.rpt_time = to_date(#{rpt_time},'yyyy-mm-dd hh24:mi:ss'),
+        t.rpt_code = #{rpt_code}
+        where t.rptid = #{rptid}
+    </update>
+
+    <insert id="insertEfdSmup" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmup">
+        insert into EFD_SMUP
+        (upid, createtime,fullcode, sm_servicecode,upphone,upcontent,uptime,ismgtype,
+        gatewayno)
+        values
+        (EMP_efd_upid.nextval,sysdate,#{fullcode}, #{sm_servicecode},#{upphone},#{upcontent},
+        to_date(#{uptime}, 'yyyy-mm-dd hh24:mi:ss'),#{ismgtype},#{gatewayno})
+    </insert>
+
+    <select id="getProviderMobileList" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix">
+        select a.mob_pref_id, a.provider_id, a.mobile_prefix
+        from t_provider_mobile_prefix a
+    </select>
+
+    <select id="getProviderIdByMobile" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix" parameterType="string">
+        select a.mob_pref_id, a.provider_id, a.mobile_prefix
+        from t_provider_mobile_prefix a
+        where instr(#{value}, h.mobile_prefix )>0
+    </select>
+
+    <select id="getEdfListByMsgId" resultType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt" parameterType="java.util.List">
+        SELECT messageid,rptid,sm_recvphone,rpt_status
+        FROM EFD_SMRPT
+        where rpt_status = 2
+
+        <foreach item="item" index="index" collection="list" open="and" separator="or" close="">
+            messageid = #{item}
+        </foreach>
+    </select>
+
+    <select id="getEfdSmrptByMssgId" resultType="java.lang.Integer" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+        SELECT rptid
+        FROM EFD_SMRPT
+        where sm_recvphone = #{sm_recvphone}
+        and messageid = #{messageid}
+        and rpt_status = 2
+        and rownum &lt;= 1
+    </select>
+
+    <update id="updateSubmitEfdRpt" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+        update EFD_SMRPT t
+        set t.sm_sendtime = to_date(#{sm_sendtime}, 'yyyy-mm-dd hh24:mi:ss'),
+        t.sendtime = to_date(#{sendtime},'yyyy-mm-dd hh24:mi:ss'),
+        t.rpt_time = to_date(#{rpt_time},'yyyy-mm-dd hh24:mi:ss'),
+        t.res_time = to_date(#{res_time},'yyyy-mm-dd hh24:mi:ss'),
+        t.res_status = #{res_status},
+        t.rpt_status = #{rpt_status},
+        t.rpt_code = #{rpt_code},
+        t.messageid = #{messageid}
+        where t.downid = #{downid}
+        and t.sm_recvphone = #{sm_recvphone}
+        and t.pknumber = #{pknumber}
+        and t.sm_serialno = #{sm_serialno}
+    </update>
+
+    <update id="updateReportEfdRpt" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+        update EFD_SMRPT t
+        set t.rpt_time = to_date(#{rpt_time},'yyyy-mm-dd hh24:mi:ss'),
+        t.rpt_status = #{rpt_status},
+        t.rpt_code = #{rpt_code}
+        where t.messageid = #{messageid}
+        and t.sm_recvphone = #{sm_recvphone}
+        and t.rpt_status = 2
+        and rownum &lt;= 1
+    </update>
+</mapper>

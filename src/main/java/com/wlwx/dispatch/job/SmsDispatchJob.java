@@ -1,0 +1,136 @@
+package com.wlwx.dispatch.job;
+
+import com.wlwx.dispatch.entity.dispatch.Smdown;
+import com.wlwx.dispatch.service.DispatchService;
+import com.wlwx.dispatch.service.impl.DispatchServiceImp;
+import com.wlwx.dispatch.util.PublicConstants;
+import com.wlwx.dispatch.util.SpringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.sql.SQLException;
+import java.util.List;
+
+public class SmsDispatchJob {
+    @Autowired
+    private DispatchService dispatchService;
+    @Autowired
+    PublicConstants p;
+    private volatile boolean state;
+    private DispatchThread dispatchThread;
+
+    public boolean isState() {
+        return state;
+    }
+
+//    private static final SmsDispatchJob job = new SmsDispatchJob();
+//
+//    //静态工厂方法
+//    public static SmsDispatchJob getInstance() {
+//        return job;
+//    }
+
+    public SmsDispatchJob(){
+        dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
+        p = (PublicConstants) SpringUtil.getBean("publicConstants");
+    }
+
+
+    public boolean startDispatch() {
+        if (!state) {
+            System.out.println("短信群发调度启动...");
+            //第一次执行
+            try {
+                dispatchService.initTaskStatus();
+            } catch (SQLException e1) {
+//            PublicConstants.tasklog.info("初始化异常", e1);
+                e1.printStackTrace();
+                return false;
+            }
+            // 启动下行短信发送线程
+            startDispatchThread();
+        }
+        state = true;
+        return state;
+    }
+
+    public void shutdownDispatch() {
+        state = false;
+        if (dispatchThread != null && dispatchThread.isAlive()) {
+            try {
+                dispatchThread.interrupt();
+                dispatchThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dispatchThread = null;
+        }
+        //TODO 监听端口停止
+
+
+    }
+
+    /**
+     * 自定义的一个UncaughtExceptionHandler
+     */
+    class ErrHandler implements Thread.UncaughtExceptionHandler {
+        /**
+         * 这里可以做任何针对异常的处理,比如记录日志等等
+         */
+        public void uncaughtException(Thread a, Throwable e) {
+            System.out.println("线程" + a.getName() + "异常退出,Message:" + e);
+            e.printStackTrace();
+            // 重启异常退出的线程
+            startDispatchThread();
+        }
+    }
+
+    private void startDispatchThread() {
+        if (dispatchThread == null) {
+            dispatchThread = new DispatchThread();
+        }
+        ErrHandler handle = new ErrHandler();
+        dispatchThread.setUncaughtExceptionHandler(handle);
+        dispatchThread.start();
+    }
+
+    class DispatchThread extends Thread {
+        public void run() {
+            while (state) {
+                int count = 0;
+                int sendRate = p.getSendRate();
+                try {
+                    long starTime = System.currentTimeMillis();
+                    List<Smdown> stList = dispatchService.getAllWaitSendSmsTask();
+                    dispatchService.batchUpdateTaskStatus(stList);
+                    System.out.println("获取(size=" + stList.size() + ")任务耗时：" + (System.currentTimeMillis() - starTime) + " ms");
+                    for (Smdown st : stList) {
+                        if (st.getSendlevel() == 0) {
+//                            sendSmdown.sendToSmdown(st);
+                        } else {
+//                            firstSendSmdown.sendToSmdown(st);
+                        }
+                        count += st.getSm_serialphones().split(",").length;
+                    }
+                } catch (Exception ex) {
+//                        PublicConstants.tasklog.warn("获取待发表异常", ex);
+                    ex.printStackTrace();
+                }
+                try {
+
+                    int sendTime = (int) (Math.floor(count / sendRate));
+                    if (sendTime > 10) {
+                        Thread.sleep(sendTime * 1000);
+                    } else {
+                        Thread.sleep(10000);
+                    }
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+

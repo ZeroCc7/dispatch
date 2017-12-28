@@ -6,21 +6,21 @@
         <header  th:replace="~{partial/header :: header}"></header>
 
         <div class="clearfix"></div>
-        
+
         <section id="main" class="p-relative" role="main">
-            
+
             <!-- 侧边栏 -->
             <aside  th:replace="~{partial/sidebar :: sidebar}"></aside>
-        
+
             <!-- Content -->
             <section id="content" class="container">
-            
+
                 <!-- Messages Drawer -->
                 <div  th:replace="~{partial/topmessage :: topmessage}"></div>
                 <h4 class="page-title">群发调度监控</h4>
 
                 <hr class="whiter" />
-                
+
                 <!-- Quick Stats -->
                 <div class="block-area">
                     <div class="row">
@@ -71,9 +71,9 @@
                 </div>
 
                 <hr class="whiter" />
-                
+
                 <!-- Main Widgets -->
-               
+
                 <div class="block-area">
                     <div class="row">
                         <div class="col-md-8">
@@ -84,7 +84,7 @@
                                     <div id="line-chart" class="main-chart" style="height: 250px"></div>
                                 </div>
                             </div>
-    
+
                             <!-- Pies -->
                             <div class="tile text-center">
                                 <div class="tile-dark p-10">
@@ -114,7 +114,7 @@
                             <!--  Recent Postings -->
                             <div class="clearfix"></div>
                         </div>
-                        
+
                         <div class="col-md-4">
 
                             <!--&lt;!&ndash; Dynamic Chart &ndash;&gt;-->
@@ -123,25 +123,23 @@
                                 <!--<div class="p-t-10 p-r-5 p-b-5">-->
                                     <!--<div id="dynamic-chart" style="height: 200px"></div>-->
                                 <!--</div>-->
-
                             <!--</div>-->
-                            <p>Basic Example</p>
                             <div class="tab-container tile">
                                 <ul class="nav tab nav-tabs">
-                                    <li class="active"><a href="#log_message">Home</a></li>
+                                    <li class="active">Home</li>
                                 </ul>
+                                <!--<i class="fa fa-play"  onclick="sendThreadStart()">start</i>-->
+                                <button class="btn btn-default fa fa-play" onclick="sendThreadStart()" >Start</button>
+                                 &nbsp;
+                                <button class="btn btn-default fa fa-stop" onclick="shutdownThreadStart()" >Stop</button>
 
-                                <div class="tab-content">
-                                    <div class="tab-pane active" id="log_message">
-                                    </div>
-                                </div>
                             </div>
-                            
+
                             <!-- Activity -->
                             <div class="tile">
                                 <h2 class="tile-title">任务状态</h2>
                                 <div class="listview narrow">
-                                    
+
                                     <div class="media">
                                         <div class="pull-right">
                                             <div class="counts" th:text="${tolAutNum}"></div>
@@ -150,7 +148,7 @@
                                             <h6>待审核</h6>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="media">
                                         <div class="pull-right">
                                             <div class="counts" th:text="${ingNum}"></div>
@@ -168,7 +166,7 @@
                                             <h6>执行成功</h6>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="media">
                                         <div class="pull-right">
                                             <div class="counts" th:text="${failTaskNum}"></div>
@@ -204,10 +202,10 @@
                         <div class="clearfix"></div>
                     </div>
                 </div>
-                
+
                 <!-- Chat -->
                 <div class="chat">
-                    
+
                     <!-- Chat List -->
                     <div class="pull-left chat-list">
                         <div class="listview narrow">
@@ -247,10 +245,10 @@
                                     <span class="t-overflow p-t-5">Ford Harnson</span>
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
-                    
+
                     <!-- Chat Area -->
                     <div class="media-body">
                         <div class="chat-header">
@@ -258,7 +256,7 @@
                                 <i class="fa fa-circle-o status m-r-5"></i> Chat with Friends
                             </a>
                         </div>
-                    
+
                         <div class="chat-body" id="messagebody">
 
                         </div>

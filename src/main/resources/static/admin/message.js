@@ -1,14 +1,14 @@
 
 // 获取公告栏信息
-$(function() {
-    connect();
-    $.ajax({
-        url: '/index/message/messages',
-        success: function (data) {
-            $("#top_messagetab").html(data);
-        }
-    });
-});
+// $(function() {
+//     // connect();
+//     $.ajax({
+//         url: '/index/message/messages',
+//         success: function (data) {
+//             $("#top_messagetab").html(data);
+//         }
+//     });
+// });
 var stompClient = null;
 
 function connect() {

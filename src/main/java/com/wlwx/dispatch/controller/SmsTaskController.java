@@ -2,6 +2,7 @@ package com.wlwx.dispatch.controller;
 
 import com.wlwx.dispatch.entity.DayNum;
 import com.wlwx.dispatch.entity.SmsTask;
+import com.wlwx.dispatch.job.SmsDispatchJob;
 import com.wlwx.dispatch.mapper.SmsTaskMapper;
 import com.wlwx.dispatch.service.SmsTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class SmsTaskController {
 
     @Autowired
     SmsTaskService smsTaskService;
+
+    private SmsDispatchJob smsDispatchJob;
 
     /**
      * 查询当月分组数据
@@ -40,5 +43,45 @@ public class SmsTaskController {
         List<SmsTask> smsTasks = smsTaskService.getTodaySmsTasks();
         model.addAttribute("smsTasks",smsTasks);
         return "smstask/smstasklist";
+    }
+
+    /**
+     * 启动发送线程
+     * @return
+     */
+    //TODO
+    @ResponseBody
+    @RequestMapping("/startSendDispatch")
+    public String startSendDispatch(Model model){
+        if(smsDispatchJob == null){
+            smsDispatchJob = new SmsDispatchJob();
+            smsDispatchJob.startDispatch();
+        }else{
+            if(smsDispatchJob.isState()){
+                return "working...";
+            }else{
+                smsDispatchJob.startDispatch();
+            }
+        }
+        return "success";
+    }
+
+    /**
+     * 停止发送线程
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/stopSendDispatch")
+    public String stopSendDispatch(Model model){
+        if(smsDispatchJob == null){
+            return "Not Working...";
+        }else{
+            if(smsDispatchJob.isState()){
+                smsDispatchJob.shutdownDispatch();
+                return "success";
+            }else{
+                return "Not Working...";
+            }
+        }
     }
 }

@@ -10,8 +10,7 @@
                to_char(h.valid_time_begin, 'yyyy-mm-dd hh24:mi:ss') valid_time_begin,
                to_char(h.valid_time_end, 'yyyy-mm-dd hh24:mi:ss') valid_time_end,
                h.email,h.telephone,h.im,h.address,h.status,h.note,h.create_time,h.create_by, h.smsverification,
-               h.current_login_ip,h.last_login_ip,to_char(h.current_login_time, 'yyyy-mm-dd hh24:mi:ss') current_login_time,
-               to_char(h.passwd_expire_time, 'yyyy-mm-dd hh24:mi:ss') passwd_expire_time,h.workflow_user_id
+               h.current_login_ip,h.last_login_ip,to_char(h.current_login_time, 'yyyy-mm-dd hh24:mi:ss') current_login_time
           FROM t_webadmin_user h
          WHERE h.user_name = #{username}
     </select>
