@@ -5,6 +5,9 @@ import com.wlwx.dispatch.entity.dispatch.SqlVo;
 import com.wlwx.dispatch.service.DispatchService;
 import com.wlwx.dispatch.service.impl.DispatchServiceImp;
 import com.wlwx.dispatch.util.PublicFunctions;
+import com.wlwx.dispatch.util.SpringUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,8 @@ public class SaveSqlThread extends Thread {
 	
 	private static SaveSqlThread instance;
 	private Thread submitThread;
-	private DispatchService dao = new DispatchServiceImp();
+	private DispatchService dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
+	private Logger logger = LogManager.getLogger(SaveSqlThread.class);
 
 	public synchronized static SaveSqlThread getInstance() {
 		if (instance == null) {
@@ -45,19 +49,15 @@ public class SaveSqlThread extends Thread {
 					try {
 						long beginTime = System.currentTimeMillis();
 						batchExcuteSql(sqlVoQueue1);
-						try {
-							long finishTime = System.currentTimeMillis();
-							long executeTime = finishTime - beginTime;
-							if (executeTime < 500) {
-								// 如果执行时间小于0.5秒，说明没有大量操作，则sleep。否则，说明有大量操作，不需要sleep
-								Thread.sleep(1000 - executeTime);
-							}
-						} catch (InterruptedException e) {
-//							PublicConstants.tasklog.error("SaveSql调度线程中断等待", e);
-							continue;
+						long finishTime = System.currentTimeMillis();
+						long executeTime = finishTime - beginTime;
+						if (executeTime < 500) {
+							// 如果执行时间小于0.5秒，说明没有大量操作，则sleep。否则，说明有大量操作，不需要sleep
+							Thread.sleep(1000 - executeTime);
 						}
 					} catch (Exception ex) {
-//						PublicConstants.tasklog.error("SaveSql调度线程出现异常", ex);
+						logger.error("SaveSql线程出现异常", ex);
+						continue;
 					}
 				}
 			}
@@ -72,7 +72,7 @@ public class SaveSqlThread extends Thread {
 		sqlVoQueue.drainTo(sqlVoList);
 		if (!PublicFunctions.isBlankList(sqlVoList)) {
 			for(SqlVo sqlVo : sqlVoList){
-				dao.BatchExcuteSql(sqlVo);
+				dispatchService.BatchExcuteSql(sqlVo);
 			}
 		}
 	}

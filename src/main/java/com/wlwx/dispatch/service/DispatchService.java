@@ -33,12 +33,12 @@ public interface DispatchService {
     /**
      * 获取号段归属表
      */
-    List<ProviderMobilePrefix> getProviderMobileList();
+    List<ProviderMobilePrefix> getProviderMobileList() throws Exception;
 
     /**
      * 根据号码获取归属
      */
-    ProviderMobilePrefix getProviderIdByMobile(String mobile);
+    ProviderMobilePrefix getProviderIdByMobile(String mobile) throws Exception;
 
     /**
      * 批量执行SQL
@@ -53,5 +53,5 @@ public interface DispatchService {
     /**
      * 查询客户信息
      */
-    Customer getCusomerById(int cust_id);
+    Customer getCusomerById(int cust_id)throws SQLException;
 }

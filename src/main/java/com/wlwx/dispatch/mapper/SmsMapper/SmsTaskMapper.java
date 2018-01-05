@@ -1,4 +1,4 @@
-package com.wlwx.dispatch.mapper;
+package com.wlwx.dispatch.mapper.SmsMapper;
 
 import com.wlwx.dispatch.entity.DayNum;
 import com.wlwx.dispatch.entity.SmsTask;

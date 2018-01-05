@@ -2,22 +2,23 @@ package com.wlwx.dispatch.job;
 
 import com.wlwx.dispatch.entity.dispatch.Smdown;
 import com.wlwx.dispatch.service.DispatchService;
-import com.wlwx.dispatch.service.impl.DispatchServiceImp;
 import com.wlwx.dispatch.util.PublicConstants;
 import com.wlwx.dispatch.util.SpringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class SmsDispatchJob {
-    @Autowired
     private DispatchService dispatchService;
-    @Autowired
     PublicConstants p;
     private volatile boolean state;
     private DispatchThread dispatchThread;
+    private SendSmsTask sendSmsTask;
+    private SendSmsTask firstSendSmsTask;
+    private Logger logger = LogManager.getLogger(SmsDispatchJob.class);
+
 
     public boolean isState() {
         return state;
@@ -33,12 +34,14 @@ public class SmsDispatchJob {
     public SmsDispatchJob(){
         dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
         p = (PublicConstants) SpringUtil.getBean("publicConstants");
+        sendSmsTask = new SendSmsTask(false);
+        firstSendSmsTask = new SendSmsTask(true);
     }
 
 
     public boolean startDispatch() {
         if (!state) {
-            System.out.println("短信群发调度启动...");
+            logger.info("短信群发调度启动...");
             //第一次执行
             try {
                 dispatchService.initTaskStatus();
@@ -78,7 +81,7 @@ public class SmsDispatchJob {
          * 这里可以做任何针对异常的处理,比如记录日志等等
          */
         public void uncaughtException(Thread a, Throwable e) {
-            System.out.println("线程" + a.getName() + "异常退出,Message:" + e);
+            logger.info("线程" + a.getName() + "异常退出,Message:" + e);
             e.printStackTrace();
             // 重启异常退出的线程
             startDispatchThread();
@@ -103,21 +106,22 @@ public class SmsDispatchJob {
                     long starTime = System.currentTimeMillis();
                     List<Smdown> stList = dispatchService.getAllWaitSendSmsTask();
                     dispatchService.batchUpdateTaskStatus(stList);
-                    System.out.println("获取(size=" + stList.size() + ")任务耗时：" + (System.currentTimeMillis() - starTime) + " ms");
+                    logger.info("获取(size=" + stList.size() + ")任务耗时：" + (System.currentTimeMillis() - starTime) + " ms");
                     for (Smdown st : stList) {
                         if (st.getSendlevel() == 0) {
-//                            sendSmdown.sendToSmdown(st);
+                            sendSmsTask.sendToSmdown(st);
                         } else {
-//                            firstSendSmdown.sendToSmdown(st);
+                            firstSendSmsTask.sendToSmdown(st);
                         }
+                        //计算总号码数
                         count += st.getSm_serialphones().split(",").length;
                     }
                 } catch (Exception ex) {
-//                        PublicConstants.tasklog.warn("获取待发表异常", ex);
+                        logger.error("获取待发表异常", ex);
                     ex.printStackTrace();
                 }
                 try {
-
+                    //根据发送速率控制发送速率
                     int sendTime = (int) (Math.floor(count / sendRate));
                     if (sendTime > 10) {
                         Thread.sleep(sendTime * 1000);
@@ -126,6 +130,7 @@ public class SmsDispatchJob {
                     }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
+                    logger.error("任务调度线程sleep 异常",e);
                     e.printStackTrace();
                 }
             }

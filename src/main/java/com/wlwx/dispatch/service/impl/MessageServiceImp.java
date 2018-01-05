@@ -1,7 +1,7 @@
 package com.wlwx.dispatch.service.impl;
 
 import com.wlwx.dispatch.entity.Notice;
-import com.wlwx.dispatch.mapper.NoticeMapper;
+import com.wlwx.dispatch.mapper.SmsMapper.NoticeMapper;
 import com.wlwx.dispatch.service.MessageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

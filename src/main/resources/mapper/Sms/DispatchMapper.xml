@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wlwx.dispatch.mapper.SmsMapper.DispatchMapper">
+    <select id="getCusomerById" parameterType="int" resultType="com.wlwx.dispatch.entity.dispatch.Customer">
+        select a.cust_id,a.cust_code,a.cust_name,a.passwd,a.client_ip,
+        a.audit_flag,a.threads,a.blacklist_filter,a.sensitive_words_filter,
+        a.parent_id,a.status,a.create_time,a.create_by,b.send_rate
+        from t_sms_customer a
+        left join t_sms_customer_parameter b
+        on a.cust_id = b.cust_id
+        where a.cust_id = #{value}
+        and status = '1'
+    </select>
+
+    <select id="getProviderMobileList" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix">
+        select a.mob_pref_id, a.provider_id, a.mobile_prefix
+        from t_provider_mobile_prefix a
+    </select>
+
+    <select id="getProviderIdByMobile" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix" parameterType="string">
+        select a.mob_pref_id, a.provider_id, a.mobile_prefix
+        from t_provider_mobile_prefix a
+        where instr(#{value}, h.mobile_prefix )>0
+    </select>
+</mapper>

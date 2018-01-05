@@ -2,6 +2,9 @@ package com.wlwx.dispatch.job;
 
 import com.wlwx.dispatch.entity.dispatch.Smdown;
 import com.wlwx.dispatch.util.PublicConstants;
+import com.wlwx.dispatch.util.SpringUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
@@ -14,13 +17,17 @@ import java.util.concurrent.TimeUnit;
 
 public class SendSmsTask {
 	private ArrayBlockingQueue<Smdown> msgQueue;
-	protected ThreadPoolExecutor taskExecutor;
+	private ThreadPoolExecutor taskExecutor;
 	private SendSmsThread sendSmsThread;
 	private PublicConstants publicConstants;
+	private boolean isFirst;
+	private Logger logger = LogManager.getLogger(SendSmsTask.class);
 
-	public SendSmsTask(){
+
+	public SendSmsTask(boolean isFirst){
 		msgQueue = new ArrayBlockingQueue<Smdown>(10000);
-		publicConstants = new PublicConstants();
+		publicConstants =(PublicConstants) SpringUtil.getBean("publicConstants");
+		this.isFirst = isFirst;
 		taskExecutor = new ThreadPoolExecutor(publicConstants.getDatCoreSize(), publicConstants.getDatMaxSize(),
 				30, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(publicConstants.getDatQueueSize()),
 				new ThreadPoolExecutor.AbortPolicy());
@@ -57,14 +64,14 @@ public class SendSmsTask {
 					}
 				
 					for(Smdown sm : smList){
-						taskExecutor.submit(new SendSmsTaskThread(sm,false));
+						taskExecutor.submit(new SendSmsTaskThread(sm,isFirst));
 					}
 				} catch (Exception ex) {
-//					PublicConstants.tasklog.info("发送线程出现异常：", ex);
+					logger.error("发送线程出现异常：", ex);
 					continue;
 				}
+				logger.info(Thread.currentThread().getName()+" is working......");
 			}
-//			log.warn("下行短信发送线程已退出！");
 		}
 	}
 	/**
@@ -75,7 +82,7 @@ public class SendSmsTask {
 		 * 这里可以做任何针对异常的处理,比如记录日志等等
 		 */
 		public void uncaughtException(Thread a, Throwable e) {
-//			PublicConstants.tasklog.info("线程" + a.getName() + "异常退出,Message:", e);
+			logger.error("线程" + a.getName() + "异常退出,Message:", e);
 			// 重启异常退出的线程
 			startSendSmsThread();
 		}

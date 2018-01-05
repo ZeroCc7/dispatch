@@ -1,7 +1,7 @@
 package com.wlwx.dispatch.service.impl;
 
 import com.wlwx.dispatch.entity.User;
-import com.wlwx.dispatch.mapper.UserMapper;
+import com.wlwx.dispatch.mapper.SmsMapper.UserMapper;
 import com.wlwx.dispatch.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

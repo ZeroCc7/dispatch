@@ -3,7 +3,6 @@ package com.wlwx.dispatch.controller;
 import com.wlwx.dispatch.entity.DayNum;
 import com.wlwx.dispatch.entity.SmsTask;
 import com.wlwx.dispatch.job.SmsDispatchJob;
-import com.wlwx.dispatch.mapper.SmsTaskMapper;
 import com.wlwx.dispatch.service.SmsTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

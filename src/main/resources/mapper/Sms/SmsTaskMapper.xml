@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wlwx.dispatch.mapper.SmsTaskMapper">
+<mapper namespace="com.wlwx.dispatch.mapper.SmsMapper.SmsTaskMapper">
     <sql id="getSmsTask">
         SELECT a.success_num,a.fail_num,a.send_task_id,a.cust_id,a.task_id,a.task_name,
                a.sms_content,to_char(a.submit_time, 'yyyy-mm-dd hh24:mi:ss') submit_time,
@@ -14,12 +14,12 @@
           JOIN t_sms_customer b
             ON a.cust_id = b.cust_id
     </sql>
-    <select id="getTodaySmsTasks" parameterType="String" resultType="SmsTask">
+    <select id="getTodaySmsTasks" parameterType="String" resultType="com.wlwx.dispatch.entity.SmsTask">
         <include refid="getSmsTask"/>
         WHERE trunc(a.submit_time)=trunc(sysdate)
     </select>
     <!--查询当月分组数据-->
-    <select id="getMonthlySmsTasks" parameterType="String" resultType="DayNum">
+    <select id="getMonthlySmsTasks" parameterType="String" resultType="com.wlwx.dispatch.entity.DayNum">
           select to_char(a.submit_time, 'dd') day , sum(a.sended_num) tolnum
             from t_sms_task a
            where to_char(sysdate, 'yyyy-mm') = to_char(a.submit_time, 'yyyy-mm')

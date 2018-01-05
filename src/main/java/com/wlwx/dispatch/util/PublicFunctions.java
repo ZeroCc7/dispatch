@@ -192,7 +192,6 @@ public class PublicFunctions {
 		for(int i=0;i<10;i++){
 			x+="," + getMoMsgId();
 		}
-		System.out.println(x);
 		String y = "";
 		for(int i=0;i<10;i++){
 			y+="," + getMoMsgId();

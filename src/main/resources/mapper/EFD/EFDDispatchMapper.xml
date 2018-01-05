@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wlwx.dispatch.mapper.DispatchMapper">
-    <select id="getAllWaitSendSmsTask"  resultType="com.wlwx.dispatch.entity.dispatch.Smdown">
+<mapper namespace="com.wlwx.dispatch.mapper.EFDMapper.EFDDispatchMapper">
+    <select id="getAllWaitSendSmsTask" resultType="com.wlwx.dispatch.entity.dispatch.Smdown">
         SELECT *
         FROM (select a.downid,
         a.sm_serialphones,
@@ -24,24 +24,11 @@
 
     </select>
 
-    <select id="getCusomerById" parameterType="int" resultType="com.wlwx.dispatch.entity.dispatch.Customer">
-        select a.cust_id,a.cust_code,a.cust_name,a.passwd,a.client_ip,
-        a.audit_flag,a.threads,a.blacklist_filter,a.sensitive_words_filter,
-        a.parent_id,a.status,a.create_time,a.create_by,b.send_rate
-        from t_sms_customer a
-        left join t_sms_customer_parameter b
-        on a.cust_id = b.cust_id
-        where a.cust_id = #{value}
-        and status = '1'
-    </select>
-
-
     <update id="updateSmdownStatus" parameterType="com.wlwx.dispatch.entity.dispatch.Smdown">
         update EFD_SMDOWN
         set taskstatus = 3
         where downid = #{downid}
     </update>
-
 
 
     <insert id="insertEfdSmrpt" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
@@ -50,13 +37,13 @@
         sm_batchno,sm_servicename,downtime,sendcode,sendlevel,  gatewayno,messageid,sendtime,res_status,
         res_time,rpt_status,rpt_time,rpt_code,subtime,pknumber,pktotal,markinfo)
         values
-        (emp_rptid.nextval,#{downid},#{sm_serialno}, #{sm_recvphone},#{sm_content},#{sm_ismgtype},#{sm_servicecode},
-        to_date(#{sm_sendtime}, 'yyyy-mm-dd hh24:mi:ss'),  #{sm_batchno},#{sm_servicename},
+        (emp_rptid.nextval,#{downid},#{sm_serialno}, #{sm_recvphone},#{sm_content},#{sm_ismgtype},#{sm_servicecode,jdbcType=VARCHAR},
+        to_date(#{sm_sendtime}, 'yyyy-mm-dd hh24:mi:ss'),  #{sm_batchno,jdbcType=VARCHAR},#{sm_servicename,jdbcType=VARCHAR},
         to_date(#{downtime}, 'yyyy-mm-dd hh24:mi:ss'),#{sendcode},#{sendlevel},#{gatewayno},#{messageid},
         to_date(#{sendtime}, 'yyyy-mm-dd hh24:mi:ss'),#{res_status},
         to_date(#{res_time}, 'yyyy-mm-dd hh24:mi:ss'),#{rpt_status},
         to_date(#{rpt_time}, 'yyyy-mm-dd hh24:mi:ss'),#{rpt_code},
-        sysdate,#{pknumber},#{pktotal},#{markinfo})
+        sysdate,#{pknumber},#{pktotal},#{markinfo,jdbcType=VARCHAR})
     </insert>
 
     <update id="updateTaskStatusToEnd" parameterType="com.wlwx.dispatch.entity.dispatch.Smdown">
@@ -89,18 +76,8 @@
         to_date(#{uptime}, 'yyyy-mm-dd hh24:mi:ss'),#{ismgtype},#{gatewayno})
     </insert>
 
-    <select id="getProviderMobileList" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix">
-        select a.mob_pref_id, a.provider_id, a.mobile_prefix
-        from t_provider_mobile_prefix a
-    </select>
-
-    <select id="getProviderIdByMobile" resultType="com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix" parameterType="string">
-        select a.mob_pref_id, a.provider_id, a.mobile_prefix
-        from t_provider_mobile_prefix a
-        where instr(#{value}, h.mobile_prefix )>0
-    </select>
-
-    <select id="getEdfListByMsgId" resultType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt" parameterType="java.util.List">
+    <select id="getEdfListByMsgId" resultType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt"
+            parameterType="java.util.List">
         SELECT messageid,rptid,sm_recvphone,rpt_status
         FROM EFD_SMRPT
         where rpt_status = 2
@@ -110,7 +87,8 @@
         </foreach>
     </select>
 
-    <select id="getEfdSmrptByMssgId" resultType="java.lang.Integer" parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
+    <select id="getEfdSmrptByMssgId" resultType="java.lang.Integer"
+            parameterType="com.wlwx.dispatch.entity.dispatch.EfdSmrpt">
         SELECT rptid
         FROM EFD_SMRPT
         where sm_recvphone = #{sm_recvphone}

@@ -1,7 +1,7 @@
 package com.wlwx.dispatch.job;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,72 +13,67 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wlwx.dispatch.entity.dispatch.*;
 import com.wlwx.dispatch.service.DispatchService;
-import com.wlwx.dispatch.service.impl.DispatchServiceImp;
 import com.wlwx.dispatch.util.PublicConstants;
 import com.wlwx.dispatch.util.PublicFunctions;
+import com.wlwx.dispatch.util.SpringUtil;
 import com.wlwx.dispatch.util.UMD5;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SendSmsTaskThread implements Runnable {
 	private String cost_code = "";
 	private String passWord = "";
 	private String smsSvcUrl=null;
-	private DispatchService dataAccess = new DispatchServiceImp();
+	private DispatchService dispatchService;
 	private Smdown smdown;
 	private boolean first;
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private PublicConstants publicConstants;
+	private Logger logger = LogManager.getLogger(SendSmsTaskThread.class);
 
 
 	public SendSmsTaskThread(Smdown smdown, boolean first){
 		this.smdown = smdown;
 		this.first = first;
-		publicConstants = new PublicConstants();
+		publicConstants = (PublicConstants) SpringUtil.getBean("publicConstants");
+		dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
+
 	}
 	public void run() {
 		long starTime = System.currentTimeMillis();
-		smsSvcUrl = "http://"+publicConstants.getBaseUrl();
-		int cust_id =publicConstants.getCustId();
-		if(first){
-			cust_id =publicConstants.getFirstSmsCustId();
-		}
-		Customer customer = dataAccess.getCusomerById(cust_id);
-		if(customer==null || customer.getStatus().equals("0")){
-//				PublicConstants.tasklog.info("custome 不存在或停用 cust_id = "+cust_id);
-			return;
-		}
-		cost_code = customer.getCust_code();
-		passWord = customer.getPasswd();
-		List<EfdSmrpt> efdSmrList = null;
 		try {
+
+			smsSvcUrl = "http://"+publicConstants.getBaseUrl();
+			int cust_id =publicConstants.getCustId();
+			if(first){
+				cust_id =publicConstants.getFirstSmsCustId();
+			}
+			Customer customer = null;
+			customer = dispatchService.getCusomerById(cust_id);
+			if(customer==null || customer.getStatus().equals("0")){
+				logger.error("custome 不存在或停用 cust_id = "+cust_id);
+				return;
+			}
+			cost_code = customer.getCust_code();
+			passWord = customer.getPasswd();
+			List<EfdSmrpt> efdSmrList = null;
 			efdSmrList = PublicFunctions.getEfdSmrptListBySmDown(smdown);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-//			PublicConstants.tasklog.info("downId:"+smdown.getDownid()+ "解析任务异常....",e1);
-			e1.printStackTrace();
-			return;
-		}
-		SqlVo sqlVo = PublicFunctions.getInsertEfdSmrptListSql(efdSmrList);
-		SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
-		StringBuffer phones = new StringBuffer();
-		int num = 0;
-		String[] descS = smdown.getSm_serialphones().split(",");
-		for(String desc : descS){
-			String[] d =  desc.split(":");
-			String mobile =d[1];
-			phones.append(",");
-			phones.append(mobile);
-			num++;
-		}
-		phones.substring(1);
-		SendSms2Http(efdSmrList,smdown,phones.toString());
-		try {
-			dataAccess.updateTaskStatusToEnd(smdown);
-		} catch (SQLException e) {
-//			PublicConstants.tasklog.info("downId:"+smdown.getDownid()+ ",修改任务完成异常....",e);
-			e.printStackTrace();
-		}
-//		PublicConstants.tasklog.info("downId:"+smdown.getDownid()+ ",phoneSize=" +num+" ,发送完成...耗时:"+(System.currentTimeMillis()- starTime)+" ms");
-		try {
+			SqlVo sqlVo = PublicFunctions.getInsertEfdSmrptListSql(efdSmrList);
+			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+			StringBuffer phones = new StringBuffer();
+			int num = 0;
+			String[] descS = smdown.getSm_serialphones().split(",");
+			for(String desc : descS){
+				String[] d =  desc.split(":");
+				String mobile =d[1];
+				phones.append(",");
+				phones.append(mobile);
+				num++;
+			}
+			phones.substring(1);
+			SendSms2Http(efdSmrList,smdown,phones.toString());
+			dispatchService.updateTaskStatusToEnd(smdown);
+			logger.info("downId:"+smdown.getDownid()+ ",phoneSize=" +num+" ,发送完成...耗时:"+(System.currentTimeMillis()- starTime)+" ms");
 			long finishTime = System.currentTimeMillis();
 			long executeTime = finishTime - starTime;
 			if (num == 150 && 950 - executeTime > 0) {
@@ -87,11 +82,11 @@ public class SendSmsTaskThread implements Runnable {
 			} else {
 				Thread.sleep(50);
 			}
-		} catch (InterruptedException e) {
-//			PublicConstants.tasklog.error("SaveSql调度线程中断等待", e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("发送 获取异常 e= "+e);
 			return;
 		}
-	
 	}
 	
 	/**
@@ -113,9 +108,11 @@ public class SendSmsTaskThread implements Runnable {
 			//是否要状态报告字段
 			submit.put("need_report", "YES");
 			postData = JSONObject.toJSONString(submit);
+			logger.info("提交参数："+postData);
 			resultMsg = PublicFunctions.postHttpRequest(smsSvcUrl+"/sendSms", postData);
-		} catch (IOException e) {
-//			PublicConstants.tasklog.info("downId:"+sm.getDownid()+",提交接口异常："+ postData,e);
+			logger.info("响应参数："+resultMsg);
+		} catch (Exception e) {
+			logger.error("downId:"+sm.getDownid()+",提交接口异常："+ postData+e);
 			String subFailTimeStr = sdf.format(new Date()); // 提交时间
 			for(EfdSmrpt efrpt : submitEfdList){
 				efrpt.setSm_sendtime(sendTimeStr);
@@ -140,7 +137,7 @@ public class SendSmsTaskThread implements Runnable {
 			List<ResultVo> resultList = submitRepVo.getResult();
 			List<EfdSmrpt> saveEfdSmrptList = new ArrayList<EfdSmrpt>();
 			for(ResultVo resultVo : resultList){
-//				PublicConstants.tasklog.info("downId:"+sm.getDownid()+",msgId="+resultVo.getMsgid()+ ",mobile="+ resultVo.getMobile() +",status="+resultVo.getCode());
+				logger.info("downId:"+sm.getDownid()+",msgId="+resultVo.getMsgid()+ ",mobile="+ resultVo.getMobile() +",status="+resultVo.getCode());
 				if (resultVo.getCode().equals("0")) {
 					String submitSuccessTime = sdf.format(new Date());
 					for(EfdSmrpt efrpt : submitEfdList){
@@ -185,16 +182,16 @@ public class SendSmsTaskThread implements Runnable {
 					excessMobile = excessMobile.substring(1);
 				}
 				SendSms2Http(submitEfdList,sm, excessMobile);
-//				PublicConstants.tasklog.info("downId:"+sm.getDownid()+", 超流(phone = "+excessMobile+")重发...");
+				logger.info("downId:"+sm.getDownid()+", 超流(phone = "+excessMobile+")重发...");
 			}
 			
 		} else {
-//			try {
-////				PublicConstants.tasklog.info("downId:"+sm.getDownid()+", 号码发送失败 resultMsg="+URLDecoder.decode(resultMsg, "UTF-8"));
-//			} catch (UnsupportedEncodingException e) {
-////				PublicConstants.tasklog.info("downId:"+sm.getDownid()+", 响应解析失败"+ resultMsg);
-//				e.printStackTrace();
-//			}
+			try {
+				logger.info("downId:"+sm.getDownid()+", 号码发送失败 resultMsg="+ URLDecoder.decode(resultMsg, "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				logger.error("downId:"+sm.getDownid()+", 响应解析失败"+ resultMsg);
+				e.printStackTrace();
+			}
 			String subFailTimeStr = sdf.format(new Date()); // 提交时间
 			for(EfdSmrpt efrpt : submitEfdList){
 				efrpt.setRes_status(1);

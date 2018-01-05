@@ -1,4 +1,4 @@
-package com.wlwx.dispatch.mapper;
+package com.wlwx.dispatch.mapper.EFDMapper;
 
 import com.wlwx.dispatch.entity.dispatch.Customer;
 import com.wlwx.dispatch.entity.dispatch.EfdSmrpt;
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface DispatchMapper {
+public interface EFDDispatchMapper {
     /**
      * 获取所有待发送任务
      * @return
@@ -19,12 +19,6 @@ public interface DispatchMapper {
     void initTaskStatus();
 
     void updateTaskStatusToEnd(Smdown sm);
-
-    List<ProviderMobilePrefix> getProviderMobileList();
-
-    ProviderMobilePrefix getProviderIdByMobile(String mobile);
-
-    Customer getCusomerById(int cust_id);
 
     void insertEfdSmrpt(EfdSmrpt efdSmrpt);
 

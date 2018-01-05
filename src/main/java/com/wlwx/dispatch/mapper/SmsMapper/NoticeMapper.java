@@ -1,4 +1,4 @@
-package com.wlwx.dispatch.mapper;
+package com.wlwx.dispatch.mapper.SmsMapper;
 
 import com.wlwx.dispatch.entity.Notice;
 import org.apache.ibatis.annotations.Mapper;

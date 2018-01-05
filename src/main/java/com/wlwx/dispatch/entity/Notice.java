@@ -1,8 +1,5 @@
 package com.wlwx.dispatch.entity;
 
-import org.apache.ibatis.type.Alias;
-
-@Alias("notice")
 public class Notice {
     private int notice_id;
     private String theme;
