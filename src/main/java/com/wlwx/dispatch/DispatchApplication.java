@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
 public class DispatchApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(DispatchApplication.class, args);
     }

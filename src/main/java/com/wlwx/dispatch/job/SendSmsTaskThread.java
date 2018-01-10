@@ -13,10 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wlwx.dispatch.entity.dispatch.*;
 import com.wlwx.dispatch.service.DispatchService;
-import com.wlwx.dispatch.util.PublicConstants;
-import com.wlwx.dispatch.util.PublicFunctions;
-import com.wlwx.dispatch.util.SpringUtil;
-import com.wlwx.dispatch.util.UMD5;
+import com.wlwx.dispatch.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +27,7 @@ public class SendSmsTaskThread implements Runnable {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private PublicConstants publicConstants;
 	private Logger logger = LogManager.getLogger(SendSmsTaskThread.class);
+	private RedisUtil redisUtil;
 
 
 	public SendSmsTaskThread(Smdown smdown, boolean first){
@@ -37,6 +35,7 @@ public class SendSmsTaskThread implements Runnable {
 		this.first = first;
 		publicConstants = (PublicConstants) SpringUtil.getBean("publicConstants");
 		dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
+		redisUtil = (RedisUtil) SpringUtil.getBean("redisUtil");
 
 	}
 	public void run() {
@@ -59,7 +58,8 @@ public class SendSmsTaskThread implements Runnable {
 			List<EfdSmrpt> efdSmrList = null;
 			efdSmrList = PublicFunctions.getEfdSmrptListBySmDown(smdown);
 			SqlVo sqlVo = PublicFunctions.getInsertEfdSmrptListSql(efdSmrList);
-			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+//			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo); 改为放入redis TODO
+			redisUtil.rpushSql(sqlVo);
 			StringBuffer phones = new StringBuffer();
 			int num = 0;
 			String[] descS = smdown.getSm_serialphones().split(",");
@@ -74,6 +74,7 @@ public class SendSmsTaskThread implements Runnable {
 			SendSms2Http(efdSmrList,smdown,phones.toString());
 			dispatchService.updateTaskStatusToEnd(smdown);
 			logger.info("downId:"+smdown.getDownid()+ ",phoneSize=" +num+" ,发送完成...耗时:"+(System.currentTimeMillis()- starTime)+" ms");
+			Statistics.runningNum--;
 			long finishTime = System.currentTimeMillis();
 			long executeTime = finishTime - starTime;
 			if (num == 150 && 950 - executeTime > 0) {
@@ -85,6 +86,7 @@ public class SendSmsTaskThread implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("发送 获取异常 e= "+e);
+			Statistics.ExceptionNum++;
 			return;
 		}
 	}
@@ -124,7 +126,9 @@ public class SendSmsTaskThread implements Runnable {
 				efrpt.setRpt_code("SubError");
 			}
 			SqlVo sqlVo = PublicFunctions.getUpdateEfdSmrptListSql(submitEfdList);
-			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+//			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+			redisUtil.rpushSql(sqlVo);
+			Statistics.ExceptionNum++;
 			return;
 		}
 		SubmitRepVo submitRepVo = JSON.parseObject(resultMsg, SubmitRepVo.class);
@@ -175,7 +179,9 @@ public class SendSmsTaskThread implements Runnable {
 				}
 			}
 			SqlVo sqlVo = PublicFunctions.getUpdateEfdSmrptListSql(saveEfdSmrptList);
-			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+//			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+			redisUtil.rpushSql(sqlVo);
+
 			if(excessFlowNum>0){
 				//超流号码再次提交
 				if(excessMobile.startsWith(",")){
@@ -189,6 +195,7 @@ public class SendSmsTaskThread implements Runnable {
 			try {
 				logger.info("downId:"+sm.getDownid()+", 号码发送失败 resultMsg="+ URLDecoder.decode(resultMsg, "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
+				Statistics.ExceptionNum++;
 				logger.error("downId:"+sm.getDownid()+", 响应解析失败"+ resultMsg);
 				e.printStackTrace();
 			}
@@ -203,7 +210,9 @@ public class SendSmsTaskThread implements Runnable {
 				efrpt.setRpt_code(submitRepVo.getRespCode());
 			}
 			SqlVo sqlVo = PublicFunctions.getUpdateEfdSmrptListSql(submitEfdList);
-			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+//			SaveSqlThread.getInstance().addEfdSmrptToQueue(sqlVo);
+			redisUtil.rpushSql(sqlVo);
+
 		}
 	}
 }

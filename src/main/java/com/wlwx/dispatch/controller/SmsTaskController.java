@@ -20,8 +20,6 @@ public class SmsTaskController {
     @Autowired
     SmsTaskService smsTaskService;
 
-    private SmsDispatchJob smsDispatchJob;
-
     /**
      * 查询当月分组数据
      * @return
@@ -48,19 +46,14 @@ public class SmsTaskController {
      * 启动发送线程
      * @return
      */
-    //TODO
     @ResponseBody
     @RequestMapping("/startSendDispatch")
     public String startSendDispatch(Model model){
-        if(smsDispatchJob == null){
-            smsDispatchJob = new SmsDispatchJob();
-            smsDispatchJob.startDispatch();
+
+        if(SmsDispatchJob.getInstance().isState()){
+            return "working...";
         }else{
-            if(smsDispatchJob.isState()){
-                return "working...";
-            }else{
-                smsDispatchJob.startDispatch();
-            }
+            SmsDispatchJob.getInstance().startDispatch();
         }
         return "success";
     }
@@ -72,15 +65,11 @@ public class SmsTaskController {
     @ResponseBody
     @RequestMapping("/stopSendDispatch")
     public String stopSendDispatch(Model model){
-        if(smsDispatchJob == null){
-            return "Not Working...";
+        if(SmsDispatchJob.getInstance().isState()){
+            SmsDispatchJob.getInstance().shutdownDispatch();
+            return "success";
         }else{
-            if(smsDispatchJob.isState()){
-                smsDispatchJob.shutdownDispatch();
-                return "success";
-            }else{
-                return "Not Working...";
-            }
+            return "Not Working...";
         }
     }
 }

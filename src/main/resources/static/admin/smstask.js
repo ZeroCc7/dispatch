@@ -1,10 +1,4 @@
 $(function() {
-    $.ajax({
-        url: '/smstask/messages',
-        success: function (data) {
-            $("#top_messagetab").html(data);
-        }
-    });
     toastr.options = {
         closeButton: false,
         debug: false,
@@ -20,36 +14,58 @@ $(function() {
         showMethod: "fadeIn",
         hideMethod: "fadeOut"
     };
+
+
 });
 
 function sendThreadStart() {
-    $.ajax({
-        url: '/smstask/startSendDispatch',
-        success: function (data) {
-            // $("#top_messagetab").html(data);
-            // alert(data)
-            if(data == "success"){
-                toastr.success('启动成功！');
-            }else{
-                toastr.error(data);
+
+
+    var message = confirm("确定启用调度？");
+    console.log(message);
+    if(message){
+        $.ajax({
+            url: '/smstask/startSendDispatch',
+            success: function (data) {
+                // $("#top_messagetab").html(data);
+                // alert(data)
+                if(data == "success"){
+                    toastr.success('启动成功！');
+                    $("#dispatchTask").removeClass("switch-off");
+                    $("#dispatchTask").attr("class", "switch-on");
+                    $("#dispatchTask").removeAttr("onclick");
+                    $("#dispatchTask").attr("onclick","shutdownThreadStart();");
+                }else{
+                    toastr.error(data);
+                }
             }
-        }
-    });
+        });
+    }
+
 }
 
 function shutdownThreadStart() {
-    $.ajax({
-        url: '/smstask/stopSendDispatch',
-        success: function (data) {
-            // $("#top_messagetab").html(data);
+    var message = confirm("确认要停用调度？");
+    console.log(message);
+    if(message){
+        $.ajax({
+            url: '/smstask/stopSendDispatch',
+            success: function (data) {
+                // $("#top_messagetab").html(data);
 
-            if(data == "success"){
-                toastr.success('停止成功！');
-            }else{
-                toastr.error(data);
+                if(data == "success"){
+                    toastr.success('停止成功！');
+                    $("#dispatchTask").removeClass("switch-on");
+                    $("#dispatchTask").attr("class", "switch-off");
+                    $("#dispatchTask").removeAttr("onclick");
+                    $("#dispatchTask").attr("onclick","sendThreadStart();");
+                }else{
+                    toastr.error(data);
+                }
+
+
             }
+        });
+    }
 
-
-        }
-    });
 }

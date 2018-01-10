@@ -3,6 +3,7 @@ package com.wlwx.dispatch.job;
 import com.wlwx.dispatch.entity.dispatch.Smdown;
 import com.wlwx.dispatch.util.PublicConstants;
 import com.wlwx.dispatch.util.SpringUtil;
+import com.wlwx.dispatch.util.Statistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,6 +69,7 @@ public class SendSmsTask {
 					}
 				} catch (Exception ex) {
 					logger.error("发送线程出现异常：", ex);
+					Statistics.ExceptionNum++;
 					continue;
 				}
 				logger.info(Thread.currentThread().getName()+" is working......");

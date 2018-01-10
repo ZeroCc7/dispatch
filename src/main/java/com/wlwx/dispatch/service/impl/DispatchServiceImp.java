@@ -63,6 +63,30 @@ public class DispatchServiceImp implements DispatchService {
     }
 
     @Override
+    public void batchInsertEfdSmup(List<EfdSmup> efdList) {
+        SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
+        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
+
+        int index = 0;
+        try {
+            for (EfdSmup efdSmup : efdList) {
+                sqlSession.insert("com.wlwx.dispatch.mapper.EFDMapper.EFDDispatchMapper.insertEfdSmup", efdSmup);
+                if(index % 500 == 0){
+                    sqlSession.commit();
+                }
+            }
+            sqlSession.commit();
+            sqlSession.clearCache();
+        } catch (Exception e){
+            logger.error("执行异常......",e);
+            e.printStackTrace();
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public void BatchExcuteSql(SqlVo sqlVo) {
         long starTime = System.currentTimeMillis();
 

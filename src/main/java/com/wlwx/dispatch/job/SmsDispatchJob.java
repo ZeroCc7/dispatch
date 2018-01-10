@@ -1,13 +1,16 @@
 package com.wlwx.dispatch.job;
 
 import com.wlwx.dispatch.entity.dispatch.Smdown;
+import com.wlwx.dispatch.server.MoReportServer;
 import com.wlwx.dispatch.service.DispatchService;
 import com.wlwx.dispatch.util.PublicConstants;
 import com.wlwx.dispatch.util.SpringUtil;
+import com.wlwx.dispatch.util.Statistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 public class SmsDispatchJob {
@@ -18,18 +21,20 @@ public class SmsDispatchJob {
     private SendSmsTask sendSmsTask;
     private SendSmsTask firstSendSmsTask;
     private Logger logger = LogManager.getLogger(SmsDispatchJob.class);
-
+    private MoReportServer moReportServer;
 
     public boolean isState() {
         return state;
     }
 
-//    private static final SmsDispatchJob job = new SmsDispatchJob();
-//
-//    //静态工厂方法
-//    public static SmsDispatchJob getInstance() {
-//        return job;
-//    }
+    private static SmsDispatchJob instance;
+
+    public synchronized static SmsDispatchJob getInstance() {
+        if (instance == null) {
+            instance = new SmsDispatchJob();
+        }
+        return instance;
+    }
 
     public SmsDispatchJob(){
         dispatchService = (DispatchService) SpringUtil.getBean("dispatchServiceImp");
@@ -38,10 +43,9 @@ public class SmsDispatchJob {
         firstSendSmsTask = new SendSmsTask(true);
     }
 
-
     public boolean startDispatch() {
         if (!state) {
-            logger.info("短信群发调度启动...");
+            state = true;
             //第一次执行
             try {
                 dispatchService.initTaskStatus();
@@ -52,8 +56,13 @@ public class SmsDispatchJob {
             }
             // 启动下行短信发送线程
             startDispatchThread();
+            //启动Sql 保存线程
+            logger.info("启动Sql 保存线程......");
+            SaveSqlThread.getInstance();
+            //启动状态报告上行监听端口
+            moReportServer = new MoReportServer();
+            Statistics.setDispatchStatrtTime(new Date());
         }
-        state = true;
         return state;
     }
 
@@ -68,9 +77,9 @@ public class SmsDispatchJob {
             }
             dispatchThread = null;
         }
-        //TODO 监听端口停止
-
-
+        //监听端口停止
+        moReportServer.unbind();
+        Statistics.setDispatchStopTime(new Date());
     }
 
     /**
@@ -89,6 +98,8 @@ public class SmsDispatchJob {
     }
 
     private void startDispatchThread() {
+        logger.info("启动任务获取线程......");
+
         if (dispatchThread == null) {
             dispatchThread = new DispatchThread();
         }
@@ -107,7 +118,9 @@ public class SmsDispatchJob {
                     List<Smdown> stList = dispatchService.getAllWaitSendSmsTask();
                     dispatchService.batchUpdateTaskStatus(stList);
                     logger.info("获取(size=" + stList.size() + ")任务耗时：" + (System.currentTimeMillis() - starTime) + " ms");
+                    Statistics.taskTolNum += stList.size();
                     for (Smdown st : stList) {
+                        Statistics.runningNum++;
                         if (st.getSendlevel() == 0) {
                             sendSmsTask.sendToSmdown(st);
                         } else {
@@ -116,9 +129,11 @@ public class SmsDispatchJob {
                         //计算总号码数
                         count += st.getSm_serialphones().split(",").length;
                     }
+                    Statistics.tolMobileNum += count;
                 } catch (Exception ex) {
-                        logger.error("获取待发表异常", ex);
+                    logger.error("获取待发表异常", ex);
                     ex.printStackTrace();
+                    Statistics.ExceptionNum++;
                 }
                 try {
                     //根据发送速率控制发送速率
@@ -129,7 +144,7 @@ public class SmsDispatchJob {
                         Thread.sleep(10000);
                     }
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
+                    Statistics.ExceptionNum++;
                     logger.error("任务调度线程sleep 异常",e);
                     e.printStackTrace();
                 }

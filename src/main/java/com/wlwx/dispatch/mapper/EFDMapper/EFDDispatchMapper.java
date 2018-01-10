@@ -1,9 +1,6 @@
 package com.wlwx.dispatch.mapper.EFDMapper;
 
-import com.wlwx.dispatch.entity.dispatch.Customer;
-import com.wlwx.dispatch.entity.dispatch.EfdSmrpt;
-import com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix;
-import com.wlwx.dispatch.entity.dispatch.Smdown;
+import com.wlwx.dispatch.entity.dispatch.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -27,4 +24,7 @@ public interface EFDDispatchMapper {
     void updateReportEfdRpt(EfdSmrpt efdSmrpt);
 
     void updateSmdownStatus(Smdown smdown);
+
+    void insertEfdSmup(EfdSmup efdSmup);
+
 }

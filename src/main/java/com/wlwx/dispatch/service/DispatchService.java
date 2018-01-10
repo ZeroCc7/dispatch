@@ -1,9 +1,6 @@
 package com.wlwx.dispatch.service;
 
-import com.wlwx.dispatch.entity.dispatch.Customer;
-import com.wlwx.dispatch.entity.dispatch.ProviderMobilePrefix;
-import com.wlwx.dispatch.entity.dispatch.Smdown;
-import com.wlwx.dispatch.entity.dispatch.SqlVo;
+import com.wlwx.dispatch.entity.dispatch.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -54,4 +51,10 @@ public interface DispatchService {
      * 查询客户信息
      */
     Customer getCusomerById(int cust_id)throws SQLException;
+
+    /**
+     * 批量保存上行
+     * @param efdSmup
+     */
+    void batchInsertEfdSmup(List<EfdSmup> efdSmup);
 }
